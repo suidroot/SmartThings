@@ -1,4 +1,4 @@
-SmartThings
+<h3>SmartThings Apps and Devices</h3>
 
 Licensed under the Apache License, Version 2.0
 Feel free to distribute in accordance with the license.
