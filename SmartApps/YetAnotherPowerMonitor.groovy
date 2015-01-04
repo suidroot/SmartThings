@@ -13,7 +13,7 @@
  *  for the specific language governing permissions and limitations under the License.
  *
  *  The latest version of this file can be found at:
- *  https://github.com/jpansarasa/smartthings/blob/master/YetAnotherPowerMonitor.groovy
+ *  https://github.com/jpansarasa/SmartThings/blob/master/SmartApps/YetAnotherPowerMonitor.groovy
  *
  *  Revision History
  *  ----------------
