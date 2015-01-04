@@ -1,7 +1,7 @@
-SmartThings
+SmartThings SmartApps
 
-Licensed under the Apache License, Version 2.0
-Feel free to distribute in accordance with the license.
+Yet Another Power Monitor
+  Using power monitoring switch, monitor for a change in power consumption, and alert when the power draw stops.
+  This SmartApp polls the monitoring switch which keeps it active for monitoring events.
 
-I assume no liability for use or misuse. Use at your own risk. 
-Enjoy
+
