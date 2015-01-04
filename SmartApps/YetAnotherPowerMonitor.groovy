@@ -25,11 +25,11 @@
 import groovy.time.*
 
 definition(
-	name: "Yet Another Power Monitor",
-	namespace: "elasticdev",
-	author: "James P",
-	description: "Using power monitoring switch, monitor for a change in power consumption, and alert when the power draw stops.",
-	category: "Convenience",
+    name: "Yet Another Power Monitor",
+    namespace: "elasticdev",
+    author: "James P",
+    description: "Using power monitoring switch, monitor for a change in power consumption, and alert when the power draw stops.",
+    category: "Convenience",
     iconUrl: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience.png",
     iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png",
     iconX3Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png")
@@ -40,44 +40,44 @@ preferences {
         paragraph "Version 1.0"
     }
 
-	section ("When this device stops drawing power") {
+    section ("When this device stops drawing power") {
         input "meter", "capability.powerMeter", multiple: false, required: true
     }
 
-	section ("Advanced options", hidden: true, hideable: true) {
-    	input "upperThreshold", "number", title: "start when power raises above (W)", description: "10", required: true
+    section ("Advanced options", hidden: true, hideable: true) {
+        input "upperThreshold", "number", title: "start when power raises above (W)", description: "10", required: true
         input "lowerThreshold", "number", title: "stop when power drops below (W)", description: "5", required: true
     }
 
     section ("Send this message") {
-    	input "message", "text", title: "Notification message", description: "Washer is done!", required: true
+        input "message", "text", title: "Notification message", description: "Washer is done!", required: true
     }
 
-	section ("Notification method") {
+    section ("Notification method") {
         input "sendPushMessage", "bool", title: "Send a push notification?"
-	}
+    }
 
     section("Select Icon") {
         icon(title: "Pick an icon for the notification", required: true)
     }
 
-	section ("Additionally", hidden: hideOptionsSection(), hideable: true) {
-		input "phone", "phone", title: "Send a text message to:", required: false
-		input "interval", "number", title: "Polling interval in minutes:", description: "5", required: false
-		input "debugOutput", "bool", title: "Enable debug logging?"
-	}
+    section ("Additionally", hidden: hideOptionsSection(), hideable: true) {
+        input "phone", "phone", title: "Send a text message to:", required: false
+        input "interval", "number", title: "Polling interval in minutes:", description: "5", required: false
+        input "debugOutput", "bool", title: "Enable debug logging?"
+    }
 }
 
 def installed() {
     log.debug "Installed with settings: ${settings}"
 
-	initialize()
+    initialize()
 }
 
 def updated() {
-	log.debug "Updated with settings: ${settings}"
+    log.debug "Updated with settings: ${settings}"
 
-	unsubscribe()
+    unsubscribe()
     initialize()
 }
 
@@ -87,11 +87,11 @@ def updated() {
  *	Create the scheduled event subscribe to the power event
  */
 def initialize() {
-	//Set the initial state
+    //Set the initial state
     state.cycleOn = false
     state.cycleStart = null
     state.cycleEnd =  null
-    
+
     //Schedule the tickler to run on the defined interval
     def pollingInterval = (interval) ? interval : 5
     def ticklerSchedule = "0 0/${pollingInterval} * * * ?"
