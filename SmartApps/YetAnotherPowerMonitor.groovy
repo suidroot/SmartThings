@@ -20,6 +20,8 @@
  *
  *  2015-01-04: Version: 1.0.0
  *  Initial Revision
+ *  2015-01-05: Version: 1.0.1
+ *  Reorganized preferences section
  */
 
 import groovy.time.*
@@ -45,8 +47,8 @@ preferences {
     }
 
     section ("Advanced options", hidden: true, hideable: true) {
-        input "upperThreshold", "number", title: "start when power raises above (W)", description: "10", required: true
-        input "lowerThreshold", "number", title: "stop when power drops below (W)", description: "5", required: true
+        input "upperThreshold", "number", title: "Start when power raises above (W)", description: "10", required: true
+        input "lowerThreshold", "number", title: "Stop when power drops below (W)", description: "5", required: true
     }
 
     section ("Send this message") {
@@ -55,6 +57,7 @@ preferences {
 
     section ("Notification method") {
         input "sendPushMessage", "bool", title: "Send a push notification?"
+        input "phone", "phone", title: "Send a text message to:", required: false
     }
 
     section("Select Icon") {
@@ -62,7 +65,6 @@ preferences {
     }
 
     section ("Additionally", hidden: hideOptionsSection(), hideable: true) {
-        input "phone", "phone", title: "Send a text message to:", required: false
         input "interval", "number", title: "Polling interval in minutes:", description: "5", required: false
         input "debugOutput", "bool", title: "Enable debug logging?"
     }
@@ -174,9 +176,9 @@ private send(msg) {
 }
 
 /**
- * Enables/Disables the optional section
+ *	Enables/Disables the optional section
  */
 private hideOptionsSection() {
-    (phone || interval || debugOutput) ? false : true
+    (interval || debugOutput) ? false : true
 }
 //EOF
