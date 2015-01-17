@@ -51,77 +51,76 @@
 
 metadata {
     definition (name: "Aeotec Heavy Duty Smart Switch", namespace: "elasticdev", author: "James P") {
-        capability "Switch"
-        capability "Energy Meter"
-        capability "Power Meter"
-        capability "Temperature Measurement"
-        capability "Configuration"
-        capability "Sensor"
+		capability "Switch"
+		capability "Energy Meter"
+		capability "Power Meter"
+		capability "Temperature Measurement"
+		capability "Configuration"
+		capability "Sensor"
 		capability "Actuator"
-        capability "Polling"
-        capability "Refresh"
-        
-        attribute "voltage", "number"
-        attribute "current", "number"
+		capability "Polling"
+		capability "Refresh"
 
-        command "reset"
-       
+		attribute "voltage", "number"
+		attribute "current", "number"
 
-        fingerprint deviceId: "0x1001", inClusters: "0x5E,0x25,0x32,0x31,0x27,0x2C,0x2B,0x70,0x85,0x59,0x56,0x72,0x86,0x7A,0x73,0x98,0xEF,0x5A"
+		command "reset"
+
+
+		fingerprint deviceId: "0x1001", inClusters: "0x5E,0x25,0x32,0x31,0x27,0x2C,0x2B,0x70,0x85,0x59,0x56,0x72,0x86,0x7A,0x73,0x98,0xEF,0x5A"
     }
 
     // simulator metadata
     simulator {
-        status "on":  "command: 2003, payload: FF"
-        status "off": "command: 2003, payload: 00"
+		status "on":  "command: 2003, payload: FF"
+		status "off": "command: 2003, payload: 00"
 
-        for (int i = 0; i <= 10000; i += 1000) {
-            status "power  ${i} W": new physicalgraph.zwave.Zwave().meterV1.meterReport(
-            scaledMeterValue: i, precision: 3, meterType: 4, scale: 2, size: 4).incomingMessage()
-        }
-        for (int i = 0; i <= 100; i += 10) {
-            status "energy  ${i} kWh": new physicalgraph.zwave.Zwave().meterV1.meterReport(
-            scaledMeterValue: i, precision: 3, meterType: 0, scale: 0, size: 4).incomingMessage()
-        }
+		for (int i = 0; i <= 10000; i += 1000) {
+			status "power  ${i} W": new physicalgraph.zwave.Zwave().meterV1.meterReport(
+			scaledMeterValue: i, precision: 3, meterType: 4, scale: 2, size: 4).incomingMessage()
+		}
+		for (int i = 0; i <= 100; i += 10) {
+			status "energy  ${i} kWh": new physicalgraph.zwave.Zwave().meterV1.meterReport(
+			scaledMeterValue: i, precision: 3, meterType: 0, scale: 0, size: 4).incomingMessage()
+		}
 
-        // reply messages
-        reply "2001FF,delay 100,2502": "command: 2503, payload: FF"
-        reply "200100,delay 100,2502": "command: 2503, payload: 00"
+		// reply messages
+		reply "2001FF,delay 100,2502": "command: 2503, payload: FF"
+		reply "200100,delay 100,2502": "command: 2503, payload: 00"
 
     }
 
     // tile definitions
     tiles {
-        standardTile("switch", "device.switch", width: 2, height: 2, canChangeIcon: true) {
-            state "on",	 label: '${name}', action: "switch.off", icon: "st.switches.switch.on",  backgroundColor: "#79b821"
-            state "off", label: '${name}', action: "switch.on",  icon: "st.switches.switch.off", backgroundColor: "#ffffff"
-        }
-        valueTile("power", "device.power", decoration: "flat") {
-            state "default",  label: '${currentValue} W'
-        }
-        valueTile("energy", "device.energy", decoration: "flat") {
-            state "default", label:'${currentValue} kWh'
-        }
-        standardTile("reset", "device.energy", inactiveLabel: false, decoration: "flat") {
-            state "default", label:'reset kWh', action:"reset"
-        }
-        standardTile("configure", "device.power", inactiveLabel: false, decoration: "flat") {
-            state "configure", label:'', action:"configuration.configure", icon:"st.secondary.configure"
-        }
-        standardTile("refresh", "device.power", inactiveLabel: false, decoration: "flat") {
-            state "default", label:'', action:"refresh.refresh", icon:"st.secondary.refresh"
-        }
+		standardTile("switch", "device.switch", width: 2, height: 2, canChangeIcon: true) {
+			state "on",	 label: '${name}', action: "switch.off", icon: "st.switches.switch.on",  backgroundColor: "#79b821"
+			state "off", label: '${name}', action: "switch.on",  icon: "st.switches.switch.off", backgroundColor: "#ffffff"
+		}
+		valueTile("power", "device.power", decoration: "flat") {
+			state "default",  label: '${currentValue} W'
+		}
+		valueTile("energy", "device.energy", decoration: "flat") {
+			state "default", label:'${currentValue} kWh'
+		}
+		standardTile("reset", "device.energy", inactiveLabel: false, decoration: "flat") {
+			state "default", label:'reset kWh', action:"reset"
+		}
+		standardTile("configure", "device.power", inactiveLabel: false, decoration: "flat") {
+			state "configure", label:'', action:"configuration.configure", icon:"st.secondary.configure"
+		}
+		standardTile("refresh", "device.power", inactiveLabel: false, decoration: "flat") {
+			state "default", label:'', action:"refresh.refresh", icon:"st.secondary.refresh"
+		}
 
-        main (["switch","power","energy"])
-        details(["switch","power","energy","reset","configure","refresh"])
+		main (["switch","power","energy"])
+		details(["switch","power","energy","reset","configure","refresh"])
     }
-    
-    
-    preferences {
-        input "reportInterval", "number", title: "Report Interval", description: "The time interval in minutes for sending device reports", defaultValue: 1, required: false, displayDuringSetup: true
-        input "switchAll", "enum", title: "Respond to switch all?", description: "How does the switch respond to the 'Switch All' command", options:["Disabled", "Off Enabled", "On Enabled", "On And Off Enabled"], defaultValue: "On And Off Enabled", required:false, displayDuringSetup: true
-        input "debugOutput", "bool", title: "Enable debug logging?", defaultValue: false, required: false, displayDuringSetup: true
-    }
+
+	preferences {
+		input "reportInterval", "number", title: "Report Interval", description: "The time interval in minutes for sending device reports", defaultValue: 1, required: false, displayDuringSetup: true
+		input "switchAll", "enum", title: "Respond to switch all?", description: "How does the switch respond to the 'Switch All' command", options:["Disabled", "Off Enabled", "On Enabled", "On And Off Enabled"], defaultValue: "On And Off Enabled", required:false, displayDuringSetup: true
+		input "debugOutput", "bool", title: "Enable debug logging?", defaultValue: false, required: false, displayDuringSetup: true
+	}
 }
 
 /********************************************************************************
@@ -136,19 +135,19 @@ metadata {
  *	String	description		The message from the device
  */
 def parse(String description) {
-    if (debugOutput) log.debug "Parse(description: \"${description}\")"
+	if (debugOutput) log.debug "Parse(description: \"${description}\")"
 
-    def event = null
-    
-    // The first parameter is the description string
-    // The second parameter is a map that specifies the version of each command to use
-    def cmd = zwave.parse(description, [0x20: 1, 0x25 : 1, 0x32 : 3, 0x31 : 5, 0x27 : 1, 0x2C : 1, 0x2B : 1, 0x70 : 1, 0x85 : 2, 0x56 : 1, 0x72 : 2, 0x86 : 2,  0x7A : 2, 0x73 : 1, 0x98 : 1,  0xEF : 1])
+	def event = null
 
-    if (cmd) {
-        event = createEvent(zwaveEvent(cmd))
-    }
-    if (debugOutput) log.debug "Parse returned ${event?.inspect()}"
-    return event
+	// The first parameter is the description string
+	// The second parameter is a map that specifies the version of each command to use
+	def cmd = zwave.parse(description, [0x20: 1, 0x25 : 1, 0x32 : 3, 0x31 : 5, 0x27 : 1, 0x2C : 1, 0x2B : 1, 0x70 : 1, 0x85 : 2, 0x56 : 1, 0x72 : 2, 0x86 : 2,  0x7A : 2, 0x73 : 1, 0x98 : 1,  0xEF : 1])
+
+	if (cmd) {
+		event = createEvent(zwaveEvent(cmd))
+	}
+	if (debugOutput) log.debug "Parse returned ${event?.inspect()}"
+	return event
 }
 
 /**
@@ -190,13 +189,13 @@ def off() {
  */
 def poll() {
     delayBetween([
-    	secure(zwave.basicV1.basicGet()),
-	    secure(zwave.switchBinaryV1.switchBinaryGet()),
-	    secure(zwave.sensormultilevelv5.SensorMultilevelGet(sensorType: 1, scale: 1)),
-    	secure(zwave.meterV3.meterGet(scale: 0)), //kWh
-    	secure(zwave.meterV3.meterGet(scale: 2)), //Wattage
-    	secure(zwave.meterV3.meterGet(scale: 4)), //Voltage
-    	secure(zwave.meterV3.meterGet(scale: 5)), //Current
+		secure(zwave.basicV1.basicGet()),
+		secure(zwave.switchBinaryV1.switchBinaryGet()),
+		secure(zwave.sensormultilevelv5.SensorMultilevelGet(sensorType: 1, scale: 1)),
+		secure(zwave.meterV3.meterGet(scale: 0)), //kWh
+		secure(zwave.meterV3.meterGet(scale: 2)), //Wattage
+		secure(zwave.meterV3.meterGet(scale: 4)), //Voltage
+		secure(zwave.meterV3.meterGet(scale: 5)), //Current
     ])
 }
 
@@ -207,13 +206,13 @@ def poll() {
  */
 def refresh() {
 	delayBetween([
-    	secure(zwave.basicV1.basicGet()),
+		secure(zwave.basicV1.basicGet()),
 		secure(zwave.switchBinaryV1.switchBinaryGet()),
-	    secure(zwave.sensorMultilevelV5.sensorMultilevelGet(sensorType: 1, scale: 1)),
-    	secure(zwave.meterV3.meterGet(scale: 0)), //kWh
-    	secure(zwave.meterV3.meterGet(scale: 2)), //Wattage
-    	secure(zwave.meterV3.meterGet(scale: 4)), //Voltage
-    	secure(zwave.meterV3.meterGet(scale: 5)), //Current
+		secure(zwave.sensorMultilevelV5.sensorMultilevelGet(sensorType: 1, scale: 1)),
+		secure(zwave.meterV3.meterGet(scale: 0)), //kWh
+		secure(zwave.meterV3.meterGet(scale: 2)), //Wattage
+		secure(zwave.meterV3.meterGet(scale: 4)), //Voltage
+		secure(zwave.meterV3.meterGet(scale: 5)), //Current
 	])
 }
 
@@ -225,7 +224,7 @@ def refresh() {
 def reset() {
 	return [
 		secure(zwave.meterV3.meterReset()),
-    	secure(zwave.meterV3.meterGet(scale: 0)) //kWh
+		secure(zwave.meterV3.meterGet(scale: 0)) //kWh
 	]
 }
 
@@ -319,11 +318,11 @@ def configure() {
  * 	Default event handler -  Called for all unhandled events
  */
 def zwaveEvent(physicalgraph.zwave.Command cmd) {
-    if (debugOutput) {
-    	log.debug "Unhandled: $cmd"
-        createEvent(descriptionText: "${device.displayName}: ${cmd}")
-    }
-    [:]
+	if (debugOutput) {
+		log.debug "Unhandled: $cmd"
+		createEvent(descriptionText: "${device.displayName}: ${cmd}")
+	}
+	[:]
 }
 
 /**
@@ -340,13 +339,13 @@ def zwaveEvent(physicalgraph.zwave.Command cmd) {
  *	Boolean		sequenced
  */
 def zwaveEvent(physicalgraph.zwave.commands.securityv1.SecurityMessageEncapsulation cmd) {
-    // Devices that support the Security command class can send messages in an encrypted form
-    // they arrive wrapped in a SecurityMessageEncapsulation command and must be unencapsulated
-    // Like zwave.parse, the parameter is a map that can specify command class versions here like in zwave.parse
-    def encapsulatedCommand = cmd.encapsulatedCommand([0x20: 1, 0x25 : 1, 0x32 : 3, 0x31 : 5, 0x27 : 1, 0x2C : 1, 0x2B : 1, 0x70 : 1, 0x85 : 2, 0x56 : 1, 0x72 : 2, 0x86 : 2,  0x7A : 2, 0x73 : 1, 0x98 : 1,  0xEF : 1])
-    if (encapsulatedCommand) {
-        return zwaveEvent(encapsulatedCommand)
-    }
+	// Devices that support the Security command class can send messages in an encrypted form
+	// they arrive wrapped in a SecurityMessageEncapsulation command and must be unencapsulated
+	// Like zwave.parse, the parameter is a map that can specify command class versions here like in zwave.parse
+	def encapsulatedCommand = cmd.encapsulatedCommand([0x20: 1, 0x25 : 1, 0x32 : 3, 0x31 : 5, 0x27 : 1, 0x2C : 1, 0x2B : 1, 0x70 : 1, 0x85 : 2, 0x56 : 1, 0x72 : 2, 0x86 : 2,  0x7A : 2, 0x73 : 1, 0x98 : 1,  0xEF : 1])
+	if (encapsulatedCommand) {
+		return zwaveEvent(encapsulatedCommand)
+	}
 }
 
 /**
@@ -410,50 +409,50 @@ def zwaveEvent(physicalgraph.zwave.commands.switchbinaryv1.SwitchBinaryReport cm
  */
 def zwaveEvent(physicalgraph.zwave.commands.meterv3.MeterReport cmd) {
 	def meterTypes = ["Unknown", "Electric", "Gas", "Water"]
-    def electricNames = ["energy", "energy", "power", "count",  "voltage", "current", "powerFactor",  "unknown"]
-    def electricUnits = ["kWh",    "kVAh",   "W",     "pulses", "V",       "A",       "Power Factor", ""]
+	def electricNames = ["energy", "energy", "power", "count",  "voltage", "current", "powerFactor",  "unknown"]
+	def electricUnits = ["kWh",    "kVAh",   "W",     "pulses", "V",       "A",       "Power Factor", ""]
 
 	//NOTE: scaledPreviousMeterValue does not always contain a value
-    if (debugOutput) log.debug "MeterReport(deltaTime:${cmd.deltaTime} secs, meterType:${meterTypes[cmd.meterType]}, meterValue:${cmd.scaledMeterValue}, previousMeterValue:${cmd.scaledPreviousMeterValue}, scale:${electricNames[cmd.scale]}(${cmd.scale}), precision:${cmd.precision}, rateType:${cmd.rateType})"
-	
+	if (debugOutput) log.debug "MeterReport(deltaTime:${cmd.deltaTime} secs, meterType:${meterTypes[cmd.meterType]}, meterValue:${cmd.scaledMeterValue}, previousMeterValue:${cmd.scaledPreviousMeterValue}, scale:${electricNames[cmd.scale]}(${cmd.scale}), precision:${cmd.precision}, rateType:${cmd.rateType})"
 
-    def previousValue = cmd.scaledPreviousMeterValue
-   
-    def map = [ name: electricNames[cmd.scale], unit: electricUnits[cmd.scale], displayed: false]
-    switch(cmd.scale) {
-    	case 0: //kWh
-        	previousValue = device.currentValue("energy")
-            map.value = cmd.scaledMeterValue
-            break;
-        case 1: //kVAh
-            map.value = cmd.scaledMeterValue
-            break;
-        case 2: //Watts
-        	previousValue = device.currentValue("power")
-            map.value = Math.round(cmd.scaledMeterValue)
-            break;
-        case 3: //pulses
-            map.value = Math.round(cmd.scaledMeterValue)
-            break;
-        case 4: //Volts
-        	previousValue = device.currentValue("voltage")
-            map.value = cmd.scaledMeterValue
-            break;
-        case 5: //Amps
-        	previousValue = device.currentValue("current")
-            map.value = cmd.scaledMeterValue
-            break;
-        case 6: //Power Factor
-        case 7: //Unknown
-            map.value = cmd.scaledMeterValue
-            break;
-        default:
-            break;
-    }
-    //Check if the value has changed my more than 5%, if so mark as a stateChange
-    map.isStateChange = ((cmd.scaledMeterValue - previousValue).abs() > (cmd.scaledMeterValue * 0.05))
-    
-    createEvent(map)
+
+	def previousValue = cmd.scaledPreviousMeterValue
+
+	def map = [ name: electricNames[cmd.scale], unit: electricUnits[cmd.scale], displayed: false]
+	switch(cmd.scale) {
+		case 0: //kWh
+			previousValue = device.currentValue("energy")
+			map.value = cmd.scaledMeterValue
+			break;
+		case 1: //kVAh
+			map.value = cmd.scaledMeterValue
+			break;
+		case 2: //Watts
+			previousValue = device.currentValue("power")
+			map.value = Math.round(cmd.scaledMeterValue)
+			break;
+		case 3: //pulses
+			map.value = Math.round(cmd.scaledMeterValue)
+			break;
+		case 4: //Volts
+			previousValue = device.currentValue("voltage")
+			map.value = cmd.scaledMeterValue
+			break;
+		case 5: //Amps
+			previousValue = device.currentValue("current")
+			map.value = cmd.scaledMeterValue
+			break;
+		case 6: //Power Factor
+		case 7: //Unknown
+			map.value = cmd.scaledMeterValue
+			break;
+		default:
+			break;
+	}
+	//Check if the value has changed my more than 5%, if so mark as a stateChange
+	map.isStateChange = ((cmd.scaledMeterValue - previousValue).abs() > (cmd.scaledMeterValue * 0.05))
+
+	createEvent(map)
 }
 
 /**
@@ -464,10 +463,10 @@ def zwaveEvent(physicalgraph.zwave.commands.meterv3.MeterReport cmd) {
  */
 def zwaveEvent(physicalgraph.zwave.commands.sensormultilevelv5.SensorMultilevelReport cmd)
 {
-    if (debugOutput) log.debug "SensorMultilevelReport(sensorType:${cmd.sensorType}, scale:${cmd.scale}, precision:${cmd.precision}, scaledSensorValue:${cmd.scaledSensorValue}, sensorValue:${cmd.sensorValue}, size:${cmd.size})"
-    //The temperature sensor only measures the internal temperature of product (Circuit board)
-    if (cmd.sensorType == physicalgraph.zwave.commands.sensormultilevelv5.SensorMultilevelReport.SENSOR_TYPE_TEMPERATURE_VERSION_1) {
+	if (debugOutput) log.debug "SensorMultilevelReport(sensorType:${cmd.sensorType}, scale:${cmd.scale}, precision:${cmd.precision}, scaledSensorValue:${cmd.scaledSensorValue}, sensorValue:${cmd.sensorValue}, size:${cmd.size})"
+	//The temperature sensor only measures the internal temperature of product (Circuit board)
+	if (cmd.sensorType == physicalgraph.zwave.commands.sensormultilevelv5.SensorMultilevelReport.SENSOR_TYPE_TEMPERATURE_VERSION_1) {
 		createEvent(name: "temperature", value: cmd.scaledSensorValue, unit: cmd.scale ? "F" : "C", displayed: false )
-    }
+	}
 }
 //EOF
