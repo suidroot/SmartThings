@@ -256,7 +256,7 @@ def configure() {
 
 	/***************************************************************
 	Device specific configuration parameters
-    ----------------------------------------------------------------
+	----------------------------------------------------------------
 	Param	Size	Default		Description
 	0x03	1		0			Current Overload Protection (0=disabled, 1=enabled)
 	0x14	1		0			LED status after power on: (0=last status, 1=always on, 2=always off)
@@ -298,16 +298,16 @@ def configure() {
 		value is 0x000F or 15 (decimal)
 	***************************************************************/
 	log.debug "configure(reportIntervalSecs: ${reportIntervalSecs}, switchAllMode: ${switchAllMode})"
-    delayBetween([
-	    secure(zwave.switchAllV1.switchAllSet(mode: switchAllMode)),
-        secure(zwave.configurationV1.configurationSet(parameterNumber: 0xFC, size: 1, scaledConfigurationValue: 0)),	//Disable Lock Configuration (0 =disable, 1 = enable).
-        secure(zwave.configurationV1.configurationSet(parameterNumber: 0x50, size: 1, scaledConfigurationValue: 2)),	//Enable to send notifications to associated devices when load changes (0=nothing, 1=hail CC, 2=basic CC report)
-        secure(zwave.configurationV1.configurationSet(parameterNumber: 0x5A, size: 1, scaledConfigurationValue: 1)),	//Enables parameter 0x5B and 0x5C (0=disabled, 1=enabled)
-        secure(zwave.configurationV1.configurationSet(parameterNumber: 0x5B, size: 2, scaledConfigurationValue: 50)),	//Minimum change in wattage for a REPORT to be sent (Valid values 0‐ 60000)
-        secure(zwave.configurationV1.configurationSet(parameterNumber: 0x5C, size: 1, scaledConfigurationValue: 10)),	//Minimum change in percentage for a REPORT to be sent (Valid values 0‐ 100)
-        secure(zwave.configurationV1.configurationSet(parameterNumber: 0x65, size: 4, scaledConfigurationValue: 15)),	//Which reports need to send in Report group 1
-        secure(zwave.configurationV1.configurationSet(parameterNumber: 0x6F, size: 4, scaledConfigurationValue: reportIntervalSecs)),	//Send Report to group 1 for this interval (Valid values 0x01‐0x7FFFFFFF).
-        secure(zwave.configurationV1.configurationSet(parameterNumber: 0xFC, size: 1, scaledConfigurationValue: 1))		//Enable Lock Configuration (0 =disable, 1 = enable).
+	delayBetween([
+		secure(zwave.switchAllV1.switchAllSet(mode: switchAllMode)),
+		secure(zwave.configurationV1.configurationSet(parameterNumber: 0xFC, size: 1, scaledConfigurationValue: 0)),	//Disable Lock Configuration (0 =disable, 1 = enable).
+		secure(zwave.configurationV1.configurationSet(parameterNumber: 0x50, size: 1, scaledConfigurationValue: 2)),	//Enable to send notifications to associated devices when load changes (0=nothing, 1=hail CC, 2=basic CC report)
+		secure(zwave.configurationV1.configurationSet(parameterNumber: 0x5A, size: 1, scaledConfigurationValue: 1)),	//Enables parameter 0x5B and 0x5C (0=disabled, 1=enabled)
+		secure(zwave.configurationV1.configurationSet(parameterNumber: 0x5B, size: 2, scaledConfigurationValue: 50)),	//Minimum change in wattage for a REPORT to be sent (Valid values 0‐ 60000)
+		secure(zwave.configurationV1.configurationSet(parameterNumber: 0x5C, size: 1, scaledConfigurationValue: 10)),	//Minimum change in percentage for a REPORT to be sent (Valid values 0‐ 100)
+		secure(zwave.configurationV1.configurationSet(parameterNumber: 0x65, size: 4, scaledConfigurationValue: 15)),	//Which reports need to send in Report group 1
+		secure(zwave.configurationV1.configurationSet(parameterNumber: 0x6F, size: 4, scaledConfigurationValue: reportIntervalSecs)),	//Send Report to group 1 for this interval (Valid values 0x01‐0x7FFFFFFF).
+		secure(zwave.configurationV1.configurationSet(parameterNumber: 0xFC, size: 1, scaledConfigurationValue: 1))		//Enable Lock Configuration (0 =disable, 1 = enable).
 	])
 }
 
@@ -397,14 +397,14 @@ def zwaveEvent(physicalgraph.zwave.commands.switchbinaryv1.SwitchBinaryReport cm
  *	COMMAND_CLASS_METER (0x32)
  *
  * 	Integer		deltaTime					Time in seconds since last report
- *	Short		meterType					Unknonwn = 0, Electric = 1, Gas = 2, Water = 3
+ *	Short		meterType					Unknown = 0, Electric = 1, Gas = 2, Water = 3
  *	List<Short>	meterValue					Meter value as an array of bytes
  * 	Double		scaledMeterValue			Meter value as a double
  *	List<Short>	previousMeterValue			Previous meter value as an array of bytes
  *	Double		scaledPreviousMeterValue	Previous meter value as a double
  *	Short		size						The size of the array for the meterValue and previousMeterValue
  *	Short		scale						The scale of the values: "kWh"=0, "kVAh"=1, "Watts"=2, "pulses"=3, "Volts"=4, "Amps"=5, "Power Factor"=6, "Unknown"=7
- *	Short		precision					The decimal precsion of the values
+ *	Short		precision					The decimal precision of the values
  *	Short		rateType					???
  *	Boolean		scale2
  */

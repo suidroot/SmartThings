@@ -1,7 +1,10 @@
-SmartThings
+<h2>SmartThings Device Types</h2>
 
-Licensed under the Apache License, Version 2.0
-Feel free to distribute in accordance with the license.
+<ul>
+<li>Aeotec HDSS</li>
+	<p>A device type for the Aeotec Heavy Duty Smart Switch from Aeon Labs</p>
+	<p>This device supports the switch control as well as reporting on the power (in Watts), energy (in kWh), voltage (in Volts), and current (in Amps). 
+	It also supports reporting the temperature (in C or F) but since it is at the circuit board level it is not a great representation of the room where the switch is installed.</p>
+	<p>This device type also has some preferences you can set if you want to adjust the reporting interval of the values to the hub and if the switch responds to a "Switch All" event.</p>
+</ul>
 
-I assume no liability for use or misuse. Use at your own risk. 
-Enjoy
