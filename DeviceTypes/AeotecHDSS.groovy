@@ -165,7 +165,7 @@ private secure(physicalgraph.zwave.Command cmd) {
  */
 def on() {
 	delayBetween([
-    	secure(zwave.basicV1.basicSet(value: 0xFF)),
+        secure(zwave.basicV1.basicSet(value: 0xFF)),
         secure(zwave.switchBinaryV1.switchBinaryGet())
 	])
 }
@@ -177,7 +177,7 @@ def on() {
  */
 def off() {
 	delayBetween([
-    	secure(zwave.basicV1.basicSet(value: 0x00)),
+        secure(zwave.basicV1.basicSet(value: 0x00)),
         secure(zwave.switchBinaryV1.switchBinaryGet())
 	])
 }
@@ -257,24 +257,24 @@ def configure() {
 	Device specific configuration parameters
 	----------------------------------------------------------------
 	Param	Size	Default		Description
-	0x03	1		0			Current Overload Protection (0=disabled, 1=enabled)
-	0x14	1		0			LED status after power on: (0=last status, 1=always on, 2=always off)
-	0x50	1		0			Enable to send notifications to associated devices in Group 1 when load changes (0=nothing, 1=hail CC, 2=basic CC report)
-	0x5A	1		0			Enables/disables parameter 0x5B and 0x5C (0=disabled, 1=enabled)
-	0x5B	2		50			The value here represents minimum change in wattage for a REPORT to be sent (Valid values 0‐ 60000)
-	0x5C	1		10			Enables/disables parameter 0x5B and 0x5C (0=disabled, 1=enabled)
-	0x64	1		N/A			Set 0x65-0x67 to default
-	0x65	4		4			Which reports need to send in Report group 1
-	0x66	4		8			Which reports need to send in Report group 2
-	0x67	4		0			Which reports need to send in Report group 3
-	0x6E	1		N/A			Set 0x6F-0x71 to default.
-	0x6F	4		5			The time interval in seconds for sending Report group 1 (Valid values 0x01‐0x7FFFFFFF).
-	0x70	4		120			The time interval in seconds for sending Report group 2 (Valid values 0x01‐0x7FFFFFFF).
-	0x71	4		120			The time interval in seconds for sending Report group 3 (Valid values 0x01‐0x7FFFFFFF).
-	0xC8	1		0			Partner  ID (0= Aeon Labs Standard Product, 1= Others).
-	0xFC	1		0			Enable/Disable Lock Configuration (0 =disable, 1 = enable).
-	0xFF	1		N/A			Reset to factory default setting
-	0xFF	4		0x55555555	Reset to factory default setting and removed from the z‐wave network
+	0x03	1   	0           Current Overload Protection (0=disabled, 1=enabled)
+	0x14	1	    0           LED status after power on: (0=last status, 1=always on, 2=always off)
+	0x50	1	    0           Enable to send notifications to associated devices in Group 1 when load changes (0=nothing, 1=hail CC, 2=basic CC report)
+	0x5A	1	    0           Enables/disables parameter 0x5B and 0x5C (0=disabled, 1=enabled)
+	0x5B	2	    50          The value here represents minimum change in wattage for a REPORT to be sent (Valid values 0‐ 60000)
+	0x5C	1	    10          Enables/disables parameter 0x5B and 0x5C (0=disabled, 1=enabled)
+	0x64	1	    N/A         Set 0x65-0x67 to default
+	0x65	4	    4           Which reports need to send in Report group 1
+	0x66	4	    8           Which reports need to send in Report group 2
+	0x67	4	    0           Which reports need to send in Report group 3
+	0x6E	1	    N/A         Set 0x6F-0x71 to default.
+	0x6F	4	    5           The time interval in seconds for sending Report group 1 (Valid values 0x01‐0x7FFFFFFF).
+	0x70	4	    120         The time interval in seconds for sending Report group 2 (Valid values 0x01‐0x7FFFFFFF).
+	0x71	4	    120         The time interval in seconds for sending Report group 3 (Valid values 0x01‐0x7FFFFFFF).
+	0xC8	1	    0           Partner  ID (0= Aeon Labs Standard Product, 1= Others).
+	0xFC	1	    0           Enable/Disable Lock Configuration (0 =disable, 1 = enable).
+	0xFF	1	    N/A         Reset to factory default setting
+	0xFF	4       0x55555555  Reset to factory default setting and removed from the z‐wave network
 
 	Configuration Values for parameters 0x65-0x67:
 	BYTE  |	7	6	5	4	3	2	1	0
@@ -282,7 +282,7 @@ def configure() {
 	MSB 0 |	0	0	0	0	0	0	0	0
 	Val 1 |	0	0	0	0	0	0	0	0
 	VAL 2 |	0	0	0	0	0	0	0	0
-	LSB	3 |	0	0	0	0	A	B	C	D
+	LSB 3 |	0	0	0	0	A	B	C	D
 
 	Bit A - Auto send Meter REPORT (for kWh) at the group time interval
 	Bit B - Auto send Meter REPORT (for watt) at the group time interval
@@ -414,7 +414,6 @@ def zwaveEvent(physicalgraph.zwave.commands.meterv3.MeterReport cmd) {
 
 	//NOTE: scaledPreviousMeterValue does not always contain a value
 	if (debugOutput) log.debug "MeterReport(deltaTime:${cmd.deltaTime} secs, meterType:${meterTypes[cmd.meterType]}, meterValue:${cmd.scaledMeterValue}, previousMeterValue:${cmd.scaledPreviousMeterValue}, scale:${electricNames[cmd.scale]}(${cmd.scale}), precision:${cmd.precision}, rateType:${cmd.rateType})"
-
 
 	def previousValue = cmd.scaledPreviousMeterValue
 
