@@ -104,7 +104,7 @@ metadata {
             state "default", label:'${currentValue} kWh'
         }
         standardTile("reset", "device.energy", inactiveLabel: false, decoration: "flat") {
-            state "default", label:'reset kWh', action:"reset"
+            state "default", label:'reset kWh', action:"reset", icon:"st.secondary.refresh-icon"
         }
         valueTile("power", "device.power", decoration: "flat") {
             state "default",  label: '${currentValue} W'
@@ -327,7 +327,6 @@ def configure() {
 	***************************************************************/
 	if (debugOutput.toBoolean()) log.debug "configure(reportIntervalSecs: ${reportIntervalSecs}, switchAllMode: ${switchAllMode})"
 	delayBetween([
-    	secure(zwave.configurationV1.configurationReport(parameterNumber: 0xFC)),
 		secure(zwave.switchAllV1.switchAllSet(mode: switchAllMode)),
 		secure(zwave.configurationV1.configurationSet(parameterNumber: 0xFC, size: 1, scaledConfigurationValue: 0)),	//Disable Lock Configuration (0 =disable, 1 = enable).
 		secure(zwave.configurationV1.configurationSet(parameterNumber: 0x50, size: 1, scaledConfigurationValue: 2)),	//Enable to send notifications to associated devices when load changes (0=nothing, 1=hail CC, 2=basic CC report)

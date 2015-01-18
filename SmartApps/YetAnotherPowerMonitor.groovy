@@ -22,6 +22,8 @@
  *  Initial Revision
  *  2015-01-05: Version: 1.0.1
  *  Reorganized preferences section
+ *  2015-01-18: Version: 1.1.0
+ *  Added option to disable polling
  */
 
 import groovy.time.*
@@ -39,7 +41,7 @@ definition(
 preferences {
     section("About") {
         paragraph "Using power monitoring switch, monitor for a change in power consumption, and alert when the power draw stops."
-        paragraph "Version 1.0"
+        paragraph "Version 1.1"
     }
 
     section ("When this device stops drawing power") {
@@ -47,8 +49,8 @@ preferences {
     }
 
     section ("Advanced options", hidden: true, hideable: true) {
-        input "upperThreshold", "number", title: "Start when power raises above (W)", description: "10", required: true
-        input "lowerThreshold", "number", title: "Stop when power drops below (W)", description: "5", required: true
+        input "upperThreshold", "number", title: "start when power raises above (W)", description: "10", required: true
+        input "lowerThreshold", "number", title: "stop when power drops below (W)", description: "5", required: true
     }
 
     section ("Send this message") {
@@ -56,7 +58,7 @@ preferences {
     }
 
     section ("Notification method") {
-        input "sendPushMessage", "bool", title: "Send a push notification?"
+        input "sendPushMessage", "boolean", title: "Send a push notification?", defaultValue: true
         input "phone", "phone", title: "Send a text message to:", required: false
     }
 
@@ -65,19 +67,20 @@ preferences {
     }
 
     section ("Additionally", hidden: hideOptionsSection(), hideable: true) {
-        input "interval", "number", title: "Polling interval in minutes:", description: "5", required: false
-        input "debugOutput", "bool", title: "Enable debug logging?"
+        input "enablePolling", "boolean", title: "Enable polling?", defaultValue: true
+        input "interval", "number", title: "Polling interval in minutes:", description: "5", defaultValue: 5, required: false
+        input "debugOutput", "boolean", title: "Enable debug logging?", defaultValue: false
     }
 }
 
 def installed() {
-    log.debug "Installed with settings: ${settings}"
+    log.trace "Installed with settings: ${settings}"
 
     initialize()
 }
 
 def updated() {
-    log.debug "Updated with settings: ${settings}"
+    log.trace "Updated with settings: ${settings}"
 
     unsubscribe()
     initialize()
@@ -98,10 +101,17 @@ def initialize() {
     def pollingInterval = (interval) ? interval : 5
     def ticklerSchedule = "0 0/${pollingInterval} * * * ?"
 
-    if (debugOutput) {
-        log.debug "Polling every ${pollingInterval} minutes"
+    if (debugOutput.toBoolean()) {
+        if (enablePolling.toBoolean()) {
+            log.debug "Polling every ${pollingInterval} minutes"
+        }
+        else {
+            log.debug "Polling disabled"
+        }
     }
-    schedule(ticklerSchedule, tickler)
+    if (enablePolling.toBoolean()) {
+        schedule(ticklerSchedule, tickler)
+    }
     subscribe(meter, "power", powerHandler)
 }
 
@@ -115,12 +125,12 @@ def initialize() {
  */
 def tickler(evt) {
     meter.poll()
-    
+
     def currPower = meter.currentValue("power")
-    if (debugOutput && currPower > upperThreshold) {
+    if (debugOutput.toBoolean() && currPower > upperThreshold) {
         log.debug "Power ${currPower}W above threshold of ${upperThreshold}W"
     }
-    else if (debugOutput && currPower <= lowerThreshold) {
+    else if (debugOutput.toBoolean() && currPower <= lowerThreshold) {
         log.debug "Power ${currPower}W below threshold of ${lowerThreshold}W"
     }
 }
@@ -133,7 +143,7 @@ def tickler(evt) {
  *	evt		The power event
  */
 def powerHandler(evt) {
-    if (debugOutput) {
+    if (debugOutput.toBoolean()) {
         log.debug "power evt: ${evt}"
         log.debug "state: ${state}"
     }
@@ -163,20 +173,20 @@ def powerHandler(evt) {
  *	msg		The string message to send to the subscribers
  */
 private send(msg) {
-    if (sendPushMessage) {
+    if (sendPushMessage.toBoolean()) {
         sendPush(msg)
     }
 
     if (phone) {
         sendSms(phone, msg)
     }
-    if (debugOutput) {
+    if (debugOutput.toBoolean()) {
         log.debug msg
     }
 }
 
 /**
- *	Enables/Disables the optional section
+ * Enables/Disables the optional section
  */
 private hideOptionsSection() {
     (interval || debugOutput) ? false : true
