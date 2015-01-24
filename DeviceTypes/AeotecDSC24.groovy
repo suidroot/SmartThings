@@ -1,7 +1,7 @@
 /**
  *  Aeon Labs Smart Switch (2nd Edition) - DSC24
  *
- *  Copyright 2015 James Pansarasa
+ *  Copyright 2015 Elastic Development
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
