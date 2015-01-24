@@ -1,5 +1,5 @@
 /* 
- *	Aeotec Heavy Duty Smart Switch
+ *	Aeon Labs Heavy Duty Smart Switch - ZW078
  *
  *  Copyright 2015 Elastic Development
  *
@@ -26,6 +26,11 @@
  *	Added tiles for current and voltage
  *	Rearranged the tiles
  *	
+ *  2015-01-24: Version: 1.2.0
+ *  Added updated() method
+ *	Moved to boolean values in state rather than call toBoolean() on preference
+ *	Cleaner logic for on() and off()
+ *
  *	Developers Notes:
  * 	Raw Description	0 0 0x1001 0 0 0 12 0x5E 0x25 0x32 0x31 0x27 0x2C 0x2B 0x70 0x85 0x59 0x56 0x72 0x86 0x7A 0x73 0x98 0xEF 0x5A
  *
@@ -55,7 +60,7 @@
  **/
 
 metadata {
-    definition (name: "Aeotec Heavy Duty Smart Switch", namespace: "elasticdev", author: "James P") {
+    definition (name: "Aeon Labs Heavy Duty Smart Energy Switch", namespace: "elasticdev", author: "James P") {
         capability "Switch"
         capability "Energy Meter"
         capability "Power Meter"
@@ -127,16 +132,43 @@ metadata {
     }
 
 	preferences {
-		input "disableOnOff", "boolean", title: "Disable On/Off?", defaultValue: false, displayDuringSetup: true
-		input "reportInterval", "number", title: "Report Interval", description: "The time interval in minutes for sending device reports", defaultValue: 1, required: false, displayDuringSetup: true
-		input "switchAll", "enum", title: "Respond to switch all?", description: "How does the switch respond to the 'Switch All' command", options:["Disabled", "Off Enabled", "On Enabled", "On And Off Enabled"], defaultValue: "On And Off Enabled", required:false, displayDuringSetup: true
-		input "debugOutput", "boolean", title: "Enable debug logging?", defaultValue: false, displayDuringSetup: true
+		input "disableOnOff", "boolean", 
+				title: "Disable On/Off?", 
+				defaultValue: false, 
+				displayDuringSetup: true
+		input "reportInterval", "number", 
+				title: "Report Interval", 
+				description: "The time interval in minutes for sending device reports", 
+				defaultValue: 5, 
+				required: false, 
+				displayDuringSetup: true
+		input "switchAll", "enum", 
+				title: "Respond to switch all?", 
+				description: "How does the switch respond to the 'Switch All' command", 
+				options:["Disabled", "Off Enabled", "On Enabled", "On And Off Enabled"], 
+				defaultValue: "On And Off Enabled", 
+				required:false, 
+				displayDuringSetup: true
+		input "debugOutput", "boolean", 
+				title: "Enable debug logging?", 
+				defaultValue: false, 
+				displayDuringSetup: true
 	}
 }
 
 /********************************************************************************
  *	Methods																		*
  ********************************************************************************/
+
+/**
+ *	updated - Called when the preferences of the device type are changed
+ */
+def updated() {
+	state.onOffDisabled = ("true" == disableOnOff)
+	state.debug = ("true" == debugOutput)
+    if (state.debug) log.debug "updated(disableOnOff: ${state.onOffDisabled}, reportInterval: ${reportInterval}, switchAll: ${switchAll}, debugOutput: ${state.debug})"
+    response(configure())
+}
 
 /**
  *	parse - Called when messages from a device are received from the hub
@@ -146,7 +178,7 @@ metadata {
  *	String	description		The message from the device
  */
 def parse(String description) {
-    if (debugOutput.toBoolean()) log.debug "Parse(description: \"${description}\")"
+    if (state.debug) log.debug "Parse(description: \"${description}\")"
 
     def event = null
 
@@ -157,7 +189,7 @@ def parse(String description) {
     if (cmd) {
         event = createEvent(zwaveEvent(cmd))
     }
-    if (debugOutput.toBoolean()) log.debug "Parse returned ${event?.inspect()}"
+    if (state.debug) log.debug "Parse returned ${event?.inspect()}"
     return event
 }
 
@@ -168,25 +200,24 @@ private secure(physicalgraph.zwave.Command cmd) {
     response(zwave.securityV1.securityMessageEncapsulation().encapsulate(cmd).format())
 }
 
-
 /**
  *	on - Turns on the switch
  *
  *	Required for the "Switch" capability
  */
 def on() {
-    if (!disableOnOff.toBoolean()) {
+    if (state.onOffDisabled) {
+        if (state.debug) log.debug "On/Off disabled"
+        delayBetween([
+	        secure(zwave.basicV1.basicGet()),
+    	    secure(zwave.switchBinaryV1.switchBinaryGet()),
+        ], 5)
+    }
+    else {
         delayBetween([
 	        secure(zwave.basicV1.basicSet(value: 0xFF)),
             secure(zwave.switchBinaryV1.switchBinaryGet())
 		])
-    }
-    else {
-        if (debugOutput.toBoolean()) log.debug "On/Off disabled"
-        delayBetween([
-	        secure(zwave.basicV1.basicGet()),
-    	    secure(zwave.switchBinaryV1.switchBinaryGet()),
-        ])
     }
 }
 
@@ -196,18 +227,18 @@ def on() {
  *	Required for the "Switch" capability
  */
 def off() {
-    if (!disableOnOff.toBoolean()) {
+    if (state.onOffDisabled) {
+        if (state.debug) log.debug "On/Off disabled"
+        delayBetween([
+	        secure(zwave.basicV1.basicGet()),
+    	    secure(zwave.switchBinaryV1.switchBinaryGet()),
+        ], 5)
+    }
+    else {
         delayBetween([
 	        secure(zwave.basicV1.basicSet(value: 0x00)),
             secure(zwave.switchBinaryV1.switchBinaryGet())
 		])
-    }
-    else {
-	    if (debugOutput.toBoolean()) log.debug "On/Off disabled"
-        delayBetween([
-	        secure(zwave.basicV1.basicGet()),
-    	    secure(zwave.switchBinaryV1.switchBinaryGet()),
-        ])
     }
 }
 
@@ -224,7 +255,7 @@ def poll() {
 		secure(zwave.meterV3.meterGet(scale: 0)), //kWh
 		secure(zwave.meterV3.meterGet(scale: 2)), //Wattage
 		secure(zwave.meterV3.meterGet(scale: 4)), //Voltage
-		secure(zwave.meterV3.meterGet(scale: 5)), //Current
+		secure(zwave.meterV3.meterGet(scale: 5))  //Current
     ])
 }
 
@@ -241,7 +272,7 @@ def refresh() {
 		secure(zwave.meterV3.meterGet(scale: 0)), //kWh
 		secure(zwave.meterV3.meterGet(scale: 2)), //Wattage
 		secure(zwave.meterV3.meterGet(scale: 4)), //Voltage
-		secure(zwave.meterV3.meterGet(scale: 5)), //Current
+		secure(zwave.meterV3.meterGet(scale: 5))  //Current
 	])
 }
 
@@ -263,8 +294,6 @@ def reset() {
  *	Required for the "Configuration" capability
  */
 def configure() {
-    if (debugOutput.toBoolean()) log.debug "configure(reportInterval:${reportInterval.toInteger()}, switchAll: ${switchAll})"
-
 	//Get the values from the preferences section
     def reportIntervalSecs = 60;
     if (reportInterval) {
@@ -325,7 +354,7 @@ def configure() {
 	Example - Send meter report for all values at group time interval
 		value is 0x000F or 15 (decimal)
 	***************************************************************/
-	if (debugOutput.toBoolean()) log.debug "configure(reportIntervalSecs: ${reportIntervalSecs}, switchAllMode: ${switchAllMode})"
+	if (state.debug) log.debug "configure(reportIntervalSecs: ${reportIntervalSecs}, switchAllMode: ${switchAllMode})"
 	delayBetween([
 		secure(zwave.switchAllV1.switchAllSet(mode: switchAllMode)),
 		secure(zwave.configurationV1.configurationSet(parameterNumber: 0xFC, size: 1, scaledConfigurationValue: 0)),	//Disable Lock Configuration (0 =disable, 1 = enable).
@@ -347,7 +376,7 @@ def configure() {
  * 	Default event handler -  Called for all unhandled events
  */
 def zwaveEvent(physicalgraph.zwave.Command cmd) {
-    if (debugOutput.toBoolean()) {
+    if (state.debug) {
         log.debug "Unhandled: $cmd"
         createEvent(descriptionText: "${device.displayName}: ${cmd}")
     }
@@ -386,8 +415,8 @@ def zwaveEvent(physicalgraph.zwave.commands.securityv1.SecurityMessageEncapsulat
  */
 def zwaveEvent(physicalgraph.zwave.commands.basicv1.BasicSet cmd) 
 {
-	if (debugOutput.toBoolean()) log.debug "BasicSet(value:${cmd.value})"
-	[name: "switch", value: cmd.value ? "on" : "off", type: "physical", displayed: true, isStateChange: true]
+	if (state.debug) log.debug "BasicSet(value:${cmd.value})"
+	createEvent(name: "switch", value: cmd.value ? "on" : "off", type: "physical", displayed: true, isStateChange: true)
 }
 
 /**
@@ -397,8 +426,8 @@ def zwaveEvent(physicalgraph.zwave.commands.basicv1.BasicSet cmd)
  */
 def zwaveEvent(physicalgraph.zwave.commands.basicv1.BasicReport cmd)
 {
-	if (debugOutput.toBoolean()) log.debug "BasicReport(value:${cmd.value})"
-	[name: "switch", value: cmd.value ? "on" : "off", type: "physical"]
+	if (state.debug) log.debug "BasicReport(value:${cmd.value})"
+	createEvent(name: "switch", value: cmd.value ? "on" : "off", type: "physical")
 }
 
 /**
@@ -408,8 +437,8 @@ def zwaveEvent(physicalgraph.zwave.commands.basicv1.BasicReport cmd)
  */
 def zwaveEvent(physicalgraph.zwave.commands.switchbinaryv1.SwitchBinarySet cmd)
 {
-	if (debugOutput.toBoolean()) log.debug "SwitchBinarySet(value:${cmd.value})"
-	[name: "switch", value: cmd.value ? "on" : "off", type: "digital", displayed: true, isStateChange: true]
+	if (state.debug) log.debug "SwitchBinarySet(value:${cmd.value})"
+	createEvent(name: "switch", value: cmd.value ? "on" : "off", type: "digital", displayed: true, isStateChange: true)
 }
 
 /**
@@ -419,8 +448,8 @@ def zwaveEvent(physicalgraph.zwave.commands.switchbinaryv1.SwitchBinarySet cmd)
  */
 def zwaveEvent(physicalgraph.zwave.commands.switchbinaryv1.SwitchBinaryReport cmd)
 {
-	if (debugOutput.toBoolean()) log.debug "SwitchBinaryReport(value:${cmd.value})"
-	[name: "switch", value: cmd.value ? "on" : "off", type: "digital"]
+	if (state.debug) log.debug "SwitchBinaryReport(value:${cmd.value})"
+	createEvent(name: "switch", value: cmd.value ? "on" : "off", type: "digital")
 }
 
 /**
@@ -443,44 +472,44 @@ def zwaveEvent(physicalgraph.zwave.commands.meterv3.MeterReport cmd) {
 	def electricNames = ["energy", "energy", "power", "count",  "voltage", "current", "powerFactor",  "unknown"]
 	def electricUnits = ["kWh",    "kVAh",   "W",     "pulses", "V",       "A",       "Power Factor", ""]
 
-	if (debugOutput.toBoolean()) log.debug "MeterReport(deltaTime:${cmd.deltaTime} secs, meterType:${meterTypes[cmd.meterType]}, meterValue:${cmd.scaledMeterValue}, previousMeterValue:${cmd.scaledPreviousMeterValue}, scale:${electricNames[cmd.scale]}(${cmd.scale}), precision:${cmd.precision}, rateType:${cmd.rateType})"
+	if (state.debug) log.debug "MeterReport(deltaTime:${cmd.deltaTime} secs, meterType:${meterTypes[cmd.meterType]}, meterValue:${cmd.scaledMeterValue}, previousMeterValue:${cmd.scaledPreviousMeterValue}, scale:${electricNames[cmd.scale]}(${cmd.scale}), precision:${cmd.precision}, rateType:${cmd.rateType})"
 
-	//NOTE ScaledPreviousMeterValue does not always contain a value
-	def previousValue = cmd.scaledPreviousMeterValue
+    //NOTE ScaledPreviousMeterValue does not always contain a value
+	def previousValue = cmd.scaledPreviousMeterValue ?: 0
 
-	def map = [ name: electricNames[cmd.scale], unit: electricUnits[cmd.scale], displayed: false]
-	switch(cmd.scale) {
-		case 0: //kWh
-			previousValue = device.currentValue("energy")
-			map.value = cmd.scaledMeterValue
-			break;
-		case 1: //kVAh
-			map.value = cmd.scaledMeterValue
-			break;
-		case 2: //Watts
-			previousValue = device.currentValue("power")
-			map.value = Math.round(cmd.scaledMeterValue)
-			break;
-		case 3: //pulses
-			map.value = Math.round(cmd.scaledMeterValue)
-			break;
-		case 4: //Volts
-			previousValue = device.currentValue("voltage")
-			map.value = cmd.scaledMeterValue
-			break;
-		case 5: //Amps
-			previousValue = device.currentValue("current")
-			map.value = cmd.scaledMeterValue
-			break;
-		case 6: //Power Factor
-		case 7: //Unknown
-			map.value = cmd.scaledMeterValue
-			break;
-		default:
-			break;
-	}
-	//Check if the value has changed my more than 5%, if so mark as a stateChange
-	map.isStateChange = ((cmd.scaledMeterValue - previousValue).abs() > (cmd.scaledMeterValue * 0.05))
+    def map = [ name: electricNames[cmd.scale], unit: electricUnits[cmd.scale], displayed: false]
+    switch(cmd.scale) {
+        case 0: //kWh
+			previousValue = device.currentValue("energy") ?: cmd.scaledPreviousMeterValue ?: 0
+            map.value = cmd.scaledMeterValue
+            break;
+        case 1: //kVAh
+            map.value = cmd.scaledMeterValue
+            break;
+        case 2: //Watts
+            previousValue = device.currentValue("power") ?: cmd.scaledPreviousMeterValue ?: 0
+            map.value = Math.round(cmd.scaledMeterValue)
+            break;
+        case 3: //pulses
+            map.value = Math.round(cmd.scaledMeterValue)
+            break;
+        case 4: //Volts
+            previousValue = device.currentValue("voltage") ?: cmd.scaledPreviousMeterValue ?: 0
+            map.value = cmd.scaledMeterValue
+            break;
+        case 5: //Amps
+            previousValue = device.currentValue("current") ?: cmd.scaledPreviousMeterValue ?: 0
+            map.value = cmd.scaledMeterValue
+            break;
+        case 6: //Power Factor
+        case 7: //Unknown
+            map.value = cmd.scaledMeterValue
+            break;
+        default:
+            break;
+    }
+    //Check if the value has changed my more than 5%, if so mark as a stateChange
+    map.isStateChange = ((cmd.scaledMeterValue - previousValue).abs() > (cmd.scaledMeterValue * 0.05))
 
 	createEvent(map)
 }
@@ -493,7 +522,7 @@ def zwaveEvent(physicalgraph.zwave.commands.meterv3.MeterReport cmd) {
  */
 def zwaveEvent(physicalgraph.zwave.commands.sensormultilevelv5.SensorMultilevelReport cmd)
 {
-	if (debugOutput.toBoolean()) log.debug "SensorMultilevelReport(sensorType:${cmd.sensorType}, scale:${cmd.scale}, precision:${cmd.precision}, scaledSensorValue:${cmd.scaledSensorValue}, sensorValue:${cmd.sensorValue}, size:${cmd.size})"
+	if (state.debug) log.debug "SensorMultilevelReport(sensorType:${cmd.sensorType}, scale:${cmd.scale}, precision:${cmd.precision}, scaledSensorValue:${cmd.scaledSensorValue}, sensorValue:${cmd.sensorValue}, size:${cmd.size})"
 	//The temperature sensor only measures the internal temperature of product (Circuit board)
 	if (cmd.sensorType == physicalgraph.zwave.commands.sensormultilevelv5.SensorMultilevelReport.SENSOR_TYPE_TEMPERATURE_VERSION_1) {
 		createEvent(name: "temperature", value: cmd.scaledSensorValue, unit: cmd.scale ? "F" : "C", displayed: false )
