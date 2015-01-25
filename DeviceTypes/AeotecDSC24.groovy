@@ -41,7 +41,6 @@
  */
 metadata {
     definition (name: "Aeon Labs Smart Switch (2nd Edition)", namespace: "elasticdev", author: "James P") {
-<<<<<<< HEAD
 	capability "Switch"
 	capability "Energy Meter"
 	capability "Actuator"
@@ -57,23 +56,6 @@ metadata {
 	command "locate"
 
 	fingerprint deviceId: "0x1001", inClusters: "0x25, 0x32, 0x27, 0x2C, 0x2B, 0x70, 0x85, 0x56, 0x72, 0x86, 0xEF, 0x82"
-=======
-        capability "Switch"
-        capability "Energy Meter"
-        capability "Actuator"
-        capability "Power Meter"
-        capability "Configuration"
-        capability "Polling"
-        capability "Refresh"
-
-        attribute "voltage", "number"
-        attribute "current", "number"
-
-        command "reset"
-        command "locate"
-        
-        fingerprint deviceId: "0x1001", inClusters: "0x25, 0x32, 0x27, 0x2C, 0x2B, 0x70, 0x85, 0x56, 0x72, 0x86, 0xEF, 0x82"
->>>>>>> origin/master
     }
 
     simulator {
@@ -91,7 +73,6 @@ metadata {
     }
 
     tiles {
-<<<<<<< HEAD
 	standardTile("switch", "device.switch", width: 2, height: 2, canChangeIcon: true) {
 	    state "on", label: '${name}', action: "switch.off", icon: "st.switches.switch.on",  backgroundColor: "#79b821"
 	    state "off", label: '${name}', action: "switch.on",  icon: "st.switches.switch.off", backgroundColor: "#ffffff"
@@ -123,39 +104,6 @@ metadata {
 
 	main (["switch","energy","power","current"])
 	details(["switch","energy","reset","power","current", "voltage","configure","refresh", "locate"])
-=======
-        standardTile("switch", "device.switch", width: 2, height: 2, canChangeIcon: true) {
-            state "on", label: '${name}', action: "switch.off", icon: "st.switches.switch.on",  backgroundColor: "#79b821"
-            state "off", label: '${name}', action: "switch.on",  icon: "st.switches.switch.off", backgroundColor: "#ffffff"
-        }
-        valueTile("energy", "device.energy", decoration: "flat") {
-            state "default", label:'${currentValue} kWh'
-        }
-        standardTile("reset", "device.energy", inactiveLabel: false, decoration: "flat") {
-            state "default", label:'reset kWh', action:"reset", icon:"st.secondary.refresh-icon"
-        }
-        valueTile("power", "device.power", decoration: "flat") {
-            state "default",  label: '${currentValue} W'
-        }
-        valueTile("current", "device.current", decoration: "flat") {
-            state "default",  label: '${currentValue} A'
-        }
-        valueTile("voltage", "device.voltage", decoration: "flat") {
-            state "default",  label: '${currentValue} V'
-        }
-        standardTile("configure", "device.power", inactiveLabel: false, decoration: "flat") {
-            state "configure", label:'', action:"configuration.configure", icon:"st.secondary.configure"
-        }
-        standardTile("refresh", "device.power", inactiveLabel: false, decoration: "flat") {
-            state "default", label:'', action:"refresh.refresh", icon:"st.secondary.refresh"
-        }
-        standardTile("locate", "device.power", inactiveLabel: false, decoration: "flat") {
-            state "default", label:'locate', action:"locate", icon:"st.presence.tile.presence-default"
-        }
-
-        main (["switch","energy","power","current"])
-        details(["switch","energy","reset","power","current", "voltage","configure","refresh", "locate"])
->>>>>>> origin/master
     }
 
     preferences {
@@ -322,25 +270,7 @@ def locate() {
 
 
 /**
-<<<<<<< HEAD
  *  configure - Configures the parameters of the device
-=======
- * 	locate - locates the device by cycling the switch for some period of time
- *
- *	Defined by the custom command "locate"
- */
-def locate() {
-	delayBetween([
-		zwave.configurationV1.configurationSet(parameterNumber: 0xFC, size: 1, scaledConfigurationValue: 0).format(),		//Disable Lock Configuration (0 =disable, 1 = enable).
-		zwave.configurationV1.configurationSet(parameterNumber: 0x02, size: 2, scaledConfigurationValue: 0x0F0A).format(),	//cycle on/off every second for 15 seconds
-		zwave.configurationV1.configurationSet(parameterNumber: 0xFC, size: 1, scaledConfigurationValue: 1).format()		//Enable Lock Configuration (0 =disable, 1 = enable).
-	])
-}
-
-
-/**
- *	configure - Configures the parameters of the device
->>>>>>> origin/master
  *
  *  Required for the "Configuration" capability
  */
@@ -572,3 +502,4 @@ def zwaveEvent(physicalgraph.zwave.commands.meterv3.MeterReport cmd) {
     createEvent(map)
 }
 //EOF
+
