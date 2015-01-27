@@ -22,21 +22,21 @@
  *  Raw Description 0 0 0x1001 0 0 0 c 0x25 0x32 0x27 0x2C 0x2B 0x70 0x85 0x56 0x72 0x86 0xEF 0x82
  *
  *  Z-Wave Supported Command Classes:
- *  Code Name					Version
- *  ==== ======================================	=======
- *  0x25 COMMAND_CLASS_SWITCH_BINARY		V1
- *  0x32 COMMAND_CLASS_METER			V3
- *  0x70 COMMAND_CLASS_CONFIGURATION		V1
- *  0x56 COMMAND_CLASS_CRC_16_ENCAP		V1
- *  ---- ---- Supported but unimplemented -----	--
- *  0x85 COMMAND_CLASS_ASSOCIATION		V2
- *  0x27 COMMAND_CLASS_SWITCH_ALL		V1
- *  0x2C COMMAND_CLASS_SCENE_ACTUATOR_CONF	V1
- *  0x2B COMMAND_CLASS_SCENE_ACTIVATION		V1
- *  0x72 COMMAND_CLASS_MANUFACTURER_SPECIFIC	V2
- *  0x86 COMMAND_CLASS_VERSION			V1
- *  0xEF COMMAND_CLASS_MARK			V1
- *  0x82 COMMAND_CLASS_HAIL			V1
+ *  Code    Name                                Version
+ *  ====    ===================================	=======
+ *  0x25    COMMAND_CLASS_SWITCH_BINARY         V1
+ *  0x32    COMMAND_CLASS_METER			V3
+ *  0x70    COMMAND_CLASS_CONFIGURATION		V1
+ *  0x56    COMMAND_CLASS_CRC_16_ENCAP		V1
+ *  ----    --- Supported but unimplemented --- --
+ *  0x85    COMMAND_CLASS_ASSOCIATION           V2
+ *  0x27    COMMAND_CLASS_SWITCH_ALL            V1
+ *  0x2C    COMMAND_CLASS_SCENE_ACTUATOR_CONF   V1
+ *  0x2B    COMMAND_CLASS_SCENE_ACTIVATION      V1
+ *  0x72    COMMAND_CLASS_MANUFACTURER_SPECIFIC V2
+ *  0x86    COMMAND_CLASS_VERSION               V1
+ *  0xEF    COMMAND_CLASS_MARK                  V1
+ *  0x82    COMMAND_CLASS_HAIL                  V1
  *
  */
 metadata {
@@ -54,56 +54,56 @@ metadata {
 
 	command "reset"
 	command "locate"
-        
+
 	fingerprint deviceId: "0x1001", inClusters: "0x25, 0x32, 0x27, 0x2C, 0x2B, 0x70, 0x85, 0x56, 0x72, 0x86, 0xEF, 0x82"
     }
 
     simulator {
-        status "on":  "command: 2003, payload: FF"
-        status "off": "command: 2003, payload: 00"
+	status "on":  "command: 2003, payload: FF"
+	status "off": "command: 2003, payload: 00"
 
-        for (int i = 0; i <= 100; i += 10) {
-            status "energy  ${i} kWh": new physicalgraph.zwave.Zwave().meterV2.meterReport(
-            	scaledMeterValue: i, precision: 3, meterType: 0, scale: 0, size: 4).incomingMessage()
-        }
+	for (int i = 0; i <= 100; i += 10) {
+	    status "energy  ${i} kWh": new physicalgraph.zwave.Zwave().meterV2.meterReport(
+		scaledMeterValue: i, precision: 3, meterType: 0, scale: 0, size: 4).incomingMessage()
+	}
 
-        // reply messages
-        reply "2001FF,delay 100,2502": "command: 2503, payload: FF"
-        reply "200100,delay 100,2502": "command: 2503, payload: 00"
+	// reply messages
+	reply "2001FF,delay 100,2502": "command: 2503, payload: FF"
+	reply "200100,delay 100,2502": "command: 2503, payload: 00"
     }
 
     tiles {
-        standardTile("switch", "device.switch", width: 2, height: 2, canChangeIcon: true) {
-            state "on", label: '${name}', action: "switch.off", icon: "st.switches.switch.on",  backgroundColor: "#79b821"
-            state "off", label: '${name}', action: "switch.on",  icon: "st.switches.switch.off", backgroundColor: "#ffffff"
-        }
-        valueTile("energy", "device.energy", decoration: "flat") {
-            state "default", label:'${currentValue} kWh'
-        }
-        standardTile("reset", "device.energy", inactiveLabel: false, decoration: "flat") {
-            state "default", label:'reset kWh', action:"reset", icon:"st.secondary.refresh-icon"
-        }
-        valueTile("power", "device.power", decoration: "flat") {
-            state "default",  label: '${currentValue} W'
-        }
-        valueTile("current", "device.current", decoration: "flat") {
-            state "default",  label: '${currentValue} A'
-        }
-        valueTile("voltage", "device.voltage", decoration: "flat") {
-            state "default",  label: '${currentValue} V'
-        }
-        standardTile("configure", "device.power", inactiveLabel: false, decoration: "flat") {
-            state "configure", label:'', action:"configuration.configure", icon:"st.secondary.configure"
-        }
-        standardTile("refresh", "device.power", inactiveLabel: false, decoration: "flat") {
-            state "default", label:'', action:"refresh.refresh", icon:"st.secondary.refresh"
-        }
-        standardTile("locate", "device.power", inactiveLabel: false, decoration: "flat") {
-            state "default", label:'locate', action:"locate", icon:"st.presence.tile.presence-default"
-        }
+	standardTile("switch", "device.switch", width: 2, height: 2, canChangeIcon: true) {
+	    state "on", label: '${name}', action: "switch.off", icon: "st.switches.switch.on",  backgroundColor: "#79b821"
+	    state "off", label: '${name}', action: "switch.on",  icon: "st.switches.switch.off", backgroundColor: "#ffffff"
+	}
+	valueTile("energy", "device.energy", decoration: "flat") {
+	    state "default", label:'${currentValue} kWh'
+	}
+	standardTile("reset", "device.energy", inactiveLabel: false, decoration: "flat") {
+	    state "default", label:'reset kWh', action:"reset", icon:"st.secondary.refresh-icon"
+	}
+	valueTile("power", "device.power", decoration: "flat") {
+	    state "default",  label: '${currentValue} W'
+	}
+	valueTile("current", "device.current", decoration: "flat") {
+	    state "default",  label: '${currentValue} A'
+	}
+	valueTile("voltage", "device.voltage", decoration: "flat") {
+	    state "default",  label: '${currentValue} V'
+	}
+	standardTile("configure", "device.power", inactiveLabel: false, decoration: "flat") {
+	    state "configure", label:'', action:"configuration.configure", icon:"st.secondary.configure"
+	}
+	standardTile("refresh", "device.power", inactiveLabel: false, decoration: "flat") {
+	    state "default", label:'', action:"refresh.refresh", icon:"st.secondary.refresh"
+	}
+	standardTile("locate", "device.power", inactiveLabel: false, decoration: "flat") {
+	    state "default", label:'locate', action:"locate", icon:"st.presence.tile.presence-default"
+	}
 
-        main (["switch", "energy", "power", "current"])
-        details(["switch", "energy", "reset", "power", "current", "voltage", "configure", "refresh", "locate"])
+	main (["switch","energy","power","current"])
+	details(["switch","energy","reset","power","current", "voltage","configure","refresh", "locate"])
     }
 
     preferences {
@@ -117,10 +117,6 @@ metadata {
 		defaultValue: 1, 
 		required: false, 
 		displayDuringSetup: true
-	input "displayEvents", "boolean", 
-		title: "Display power events in the Activity log? ", 
-		defaultValue: true, 
-		displayDuringSetup: true
 	input "switchAll", "enum", 
 		title: "Respond to switch all?", 
 		description: "How does the switch respond to the 'Switch All' command", 
@@ -132,7 +128,7 @@ metadata {
 		title: "Enable debug logging?", 
 		defaultValue: false, 
 		displayDuringSetup: true
-	}
+    }
 }
 
 /********************************************************************************
@@ -140,13 +136,12 @@ metadata {
  ********************************************************************************/
 
 /**
- *  updated - Called when the preferences of the device type are changed
+ *	updated - Called when the preferences of the device type are changed
  */
 def updated() {
     state.onOffDisabled = ("true" == disableOnOff)
-    state.display = ("true" == displayEvents)
     state.debug = ("true" == debugOutput)
-    if (state.debug) log.debug "updated(disableOnOff: ${disableOnOff}(${state.onOffDisabled}), reportInterval: ${reportInterval}, displayEvents: ${displayEvents}, switchAll: ${switchAll}, debugOutput: ${debugOutput}(${state.debug}))"
+    if (state.onOffDisabled) log.debug "updated(disableOnOff: ${disableOnOff}(${state.onOffDisabled}), reportInterval: ${reportInterval}, switchAll: ${switchAll}, debugOutput: ${debugOutput}(${state.debug}))"
     response(configure())
 }
 
@@ -156,10 +151,10 @@ def updated() {
  *
  *  The parse method is responsible for interpreting those messages and returning Event definitions.
  *
- *  String	description		The message from the device
+ *  String  description	    The message from the device
  */
 def parse(String description) {
-    if (state.debug) log.debug "Parse(description: \"${description}\")"
+    if (state.onOffDisabled) log.debug "Parse(description: \"${description}\")"
 
     def event = null
 
@@ -167,11 +162,10 @@ def parse(String description) {
     // The second parameter is a map that specifies the version of each command to use
     def cmd = zwave.parse(description, [0x20: 1, 0x25: 1, 0x32 : 3, 0x56 : 1, 0x70 : 1, 0x27 : 1, 0x2B : 1, 0x2C : 1, 0x72 : 2, 0x82 : 1, 0x85 : 2 ,0x86 : 1, 0xEF : 1])
 
-    if (state.debug) log.debug "cmd: \"${cmd}\")"
     if (cmd) {
-        event = createEvent(zwaveEvent(cmd))
+	event = createEvent(zwaveEvent(cmd))
     }
-    if (state.debug) log.debug "Parse returned ${event?.inspect()}"
+    if (state.onOffDisabled) log.debug "Parse returned ${event?.inspect()}"
     return event
 }
 
@@ -182,16 +176,16 @@ def parse(String description) {
  */
 def on() {
     if (state.onOffDisabled) {
-        if (state.debug) log.debug "On/Off disabled"
-        delayBetween([
+	if (state.debug) log.debug "On/Off disabled"
+	delayBetween([
 	    zwave.basicV1.basicGet().format(),
-    	    zwave.switchBinaryV1.switchBinaryGet().format()
-        ])
+	    zwave.switchBinaryV1.switchBinaryGet().format()
+	])
     }
     else {
-        delayBetween([
+	delayBetween([
 	    zwave.basicV1.basicSet(value: 0xFF).format(),
-            zwave.switchBinaryV1.switchBinaryGet().format()
+	    zwave.switchBinaryV1.switchBinaryGet().format()
 	])
     }
 }
@@ -203,16 +197,16 @@ def on() {
  */
 def off() {
     if (state.onOffDisabled) {
-        if (state.debug) log.debug "On/Off disabled"
-        delayBetween([
+	if (state.debug) log.debug "On/Off disabled"
+	delayBetween([
 	    zwave.basicV1.basicGet().format(),
-    	    zwave.switchBinaryV1.switchBinaryGet().format()
-        ])
+	    zwave.switchBinaryV1.switchBinaryGet().format()
+	])
     }
     else {
-        delayBetween([
+	delayBetween([
 	    zwave.basicV1.basicSet(value: 0x00).format(),
-            zwave.switchBinaryV1.switchBinaryGet().format()
+	    zwave.switchBinaryV1.switchBinaryGet().format()
 	])
     }
 }
@@ -274,6 +268,7 @@ def locate() {
     ])
 }
 
+
 /**
  *  configure - Configures the parameters of the device
  *
@@ -300,42 +295,40 @@ def configure() {
     /***************************************************************
     Device specific configuration parameters
     ----------------------------------------------------------------
-    Param Size Default	Description
-    0x02  2    0x0F0A   Make Smart Switch blink.
-    0x03  1    0        Current Overload Protection (0=disabled, 1=enabled)
-    0x50  1    0        Enable to send notifications to associated devices in Group 1 when load changes (0=nothing, 1=hail CC, 2=basic CC report)
-    0x5A  1    0        Enables/disables parameter 0x5B and 0x5C (0=disabled, 1=enabled)
-    0x5B  2    50       The value here represents minimum change in wattage for a REPORT to be sent (Valid values 0‐ 60000)
-    0x5C  1    10       Enables/disables parameter 0x5B and 0x5C (0=disabled, 1=enabled)
-    0x64  1    N/A      Set 0x65-0x67 to default
-    0x65  4    4        Which reports need to send in Report group 1
-    0x66  4    8        Which reports need to send in Report group 2
-    0x67  4    0        Which reports need to send in Report group 3
-    0x6E  1    N/A      Set 0x6F-0x71 to default.
-    0x6F  4    3        The time interval in seconds for sending Report group 1 (Valid values 0x01‐0x7FFFFFFF).
-    0x70  4    600      The time interval in seconds for sending Report group 2 (Valid values 0x01‐0x7FFFFFFF).
-    0x71  4    600      The time interval in seconds for sending Report group 3 (Valid values 0x01‐0x7FFFFFFF).
-    0xC8  1    0        Partner  ID (0= Aeon Labs Standard Product, 1= Others).
-    0xFC  1    0        Enable/Disable Lock Configuration (0 =disable, 1 = enable).
-    0xFE  2    0        Device Tag
-    0xFF  1    N/A      Reset to factory default setting
+    Param   Size    Default Description
+    0x02    2	    0x0F0A  Make Smart Switch blink.
+    0x03    1	    0	    Current Overload Protection (0=disabled, 1=enabled)
+    0x50    1	    0	    Enable to send notifications to associated devices in Group 1 when load changes (0=nothing, 1=hail CC, 2=basic CC report)
+    0x5A    1	    0	    Enables/disables parameter 0x5B and 0x5C (0=disabled, 1=enabled)
+    0x5B    2	    50	    The value here represents minimum change in wattage for a REPORT to be sent (Valid values 0‐ 60000)
+    0x5C    1	    10	    Enables/disables parameter 0x5B and 0x5C (0=disabled, 1=enabled)
+    0x64    1	    N/A	    Set 0x65-0x67 to default
+    0x65    4	    4	    Which reports need to send in Report group 1
+    0x66    4	    8	    Which reports need to send in Report group 2
+    0x67    4	    0	    Which reports need to send in Report group 3
+    0x6E    1	    N/A	    Set 0x6F-0x71 to default.
+    0x6F    4	    3	    The time interval in seconds for sending Report group 1 (Valid values 0x01‐0x7FFFFFFF).
+    0x70    4	    600	    The time interval in seconds for sending Report group 2 (Valid values 0x01‐0x7FFFFFFF).
+    0x71    4	    600	    The time interval in seconds for sending Report group 3 (Valid values 0x01‐0x7FFFFFFF).
+    0xC8    1	    0	    Partner  ID (0= Aeon Labs Standard Product, 1= Others).
+    0xFC    1	    0	    Enable/Disable Lock Configuration (0 =disable, 1 = enable).
+    0xFE    2	    0	    Device Tag
+    0xFF    1	    N/A	    Reset to factory default setting
 
     Configuration Values for parameter 0x02:
-    Byte Value  Description
-    MSB  1-255	Specifies the time that Smart Switch blinks, The unit is Second;  
-    LSB  1-255	Specifies the on/off status of the cycle, its unit is 0.1 second. 
+    MSB	1-255	Specifies the time that Smart Switch blinks, The unit is Second;  
+    LSB	1-255	Specifies the on/off status of the cycle, its unit is 0.1 second. 
     
     Example - Sending the value of 0x0F0A
-              Smart Switch will cycle on/off every second (0x0A = 10) 
-	      and repeat for 15 seconds (0x0F = 15)
+    	Smart Switch will cycle on/off every second (0x0A = 10) and repeat for 15 seconds (0x0F = 15)
 
     Configuration Values for parameters 0x65-0x67:
-    BYTE  | 7  6  5  4  3  2  1  0
-    ===============================
-    MSB 0 | 0  0  0  0  0  0  0  0
-    Val 1 | 0  0  0  0  0  0  0  0
-    Val 2 | 0  0  0  0  0  0  0  0
-    LSB 3 | 0  0  0  0  A  B  C  D
+    BYTE  | 7	6   5	4   3	2   1	0
+    =====================================
+    MSB 0 | 0	0   0	0   0	0   0	0
+    Val 1 | 0	0   0	0   0	0   0	0
+    VAL 2 | 0	0   0	0   0	0   0	0
+    LSB 3 | 0	0   0	0   A	B   C	D
 
     Bit A - Auto send Meter REPORT (for kWh) at the group time interval
     Bit B - Auto send Meter REPORT (for watt) at the group time interval
@@ -343,11 +336,11 @@ def configure() {
     Bit D - Auto send Meter REPORT (for voltage) at the group time interval
 
     Example - Send meter report for watt and voltage at group time interval
-	      value is 0x0005 
+	value is 0x0005 
     Example - Send meter report for kWh and current at group time interval
-	      value is 0x000A or 10 (decimal)
+	value is 0x000A or 10 (decimal)
     Example - Send meter report for all values at group time interval
-	      value is 0x000F or 15 (decimal)
+	value is 0x000F or 15 (decimal)
     ***************************************************************/
     if (state.debug) log.debug "configure(reportIntervalSecs: ${reportIntervalSecs}, switchAllMode: ${switchAllMode})"
     delayBetween([
@@ -355,8 +348,8 @@ def configure() {
 	zwave.configurationV1.configurationSet(parameterNumber: 0xFC, size: 1, scaledConfigurationValue: 0).format(),	//Disable Lock Configuration (0 =disable, 1 = enable).
 	zwave.configurationV1.configurationSet(parameterNumber: 0x50, size: 1, scaledConfigurationValue: 2).format(),	//Enable to send notifications to associated devices when load changes (0=nothing, 1=hail CC, 2=basic CC report)
 	zwave.configurationV1.configurationSet(parameterNumber: 0x5A, size: 1, scaledConfigurationValue: 1).format(),	//Enables parameter 0x5B and 0x5C (0=disabled, 1=enabled)
-	zwave.configurationV1.configurationSet(parameterNumber: 0x5B, size: 2, scaledConfigurationValue: 10).format(),	//Minimum change in wattage for a REPORT to be sent (Valid values 0 - 60000)
-	zwave.configurationV1.configurationSet(parameterNumber: 0x5C, size: 1, scaledConfigurationValue: 5).format(),	//Minimum change in percentage for a REPORT to be sent (Valid values 0 - 100)
+	zwave.configurationV1.configurationSet(parameterNumber: 0x5B, size: 2, scaledConfigurationValue: 50).format(),	//Minimum change in wattage for a REPORT to be sent (Valid values 0‐ 60000)
+	zwave.configurationV1.configurationSet(parameterNumber: 0x5C, size: 1, scaledConfigurationValue: 10).format(),	//Minimum change in percentage for a REPORT to be sent (Valid values 0‐ 100)
 	zwave.configurationV1.configurationSet(parameterNumber: 0x65, size: 4, scaledConfigurationValue: 15).format(),	//Which reports need to send in Report group 1
 	zwave.configurationV1.configurationSet(parameterNumber: 0x6F, size: 4, scaledConfigurationValue: reportIntervalSecs).format(),	//Send Report to group 1 for this interval (Valid values 0x01‐0x7FFFFFFF).
 	zwave.configurationV1.configurationSet(parameterNumber: 0xFC, size: 1, scaledConfigurationValue: 1).format()	//Enable Lock Configuration (0 =disable, 1 = enable).
@@ -404,20 +397,20 @@ def zwaveEvent(physicalgraph.zwave.commands.securityv1.SecurityMessageEncapsulat
 }
 
 /**
- *   COMMAND_CLASS_BASIC (0x20)
+ *  COMMAND_CLASS_BASIC (0x20)
  *
- *   Short	value		0xFF for on, 0x00 for off
+ *  Short	value	0xFF for on, 0x00 for off
  */
 def zwaveEvent(physicalgraph.zwave.commands.basicv1.BasicSet cmd) 
 {
-	if (state.debug) log.debug "BasicSet(value:${cmd.value})"
-	createEvent(name: "switch", value: cmd.value ? "on" : "off", type: "physical", displayed: true, isStateChange: true)
+    if (state.debug) log.debug "BasicSet(value:${cmd.value})"
+    createEvent(name: "switch", value: cmd.value ? "on" : "off", type: "physical", displayed: true, isStateChange: true)
 }
 
 /**
- *   COMMAND_CLASS_BASIC (0x20)
+ *  COMMAND_CLASS_BASIC (0x20)
  *
- *   Short	value		0xFF for on, 0x00 for off
+ *  Short	value	0xFF for on, 0x00 for off
  */
 def zwaveEvent(physicalgraph.zwave.commands.basicv1.BasicReport cmd)
 {
@@ -428,7 +421,7 @@ def zwaveEvent(physicalgraph.zwave.commands.basicv1.BasicReport cmd)
 /**
  *  COMMAND_CLASS_SWITCH_BINARY (0x25)
  *
- *  Short	value		0xFF for on, 0x00 for off
+ *  Short	value	0xFF for on, 0x00 for off
  */
 def zwaveEvent(physicalgraph.zwave.commands.switchbinaryv1.SwitchBinarySet cmd)
 {
@@ -439,7 +432,7 @@ def zwaveEvent(physicalgraph.zwave.commands.switchbinaryv1.SwitchBinarySet cmd)
 /**
  *  COMMAND_CLASS_SWITCH_BINARY (0x25)
  *
- *  Short	value		0xFF for on, 0x00 for off
+ *  Short	value	0xFF for on, 0x00 for off
  */
 def zwaveEvent(physicalgraph.zwave.commands.switchbinaryv1.SwitchBinaryReport cmd)
 {
@@ -472,7 +465,7 @@ def zwaveEvent(physicalgraph.zwave.commands.meterv3.MeterReport cmd) {
     //NOTE ScaledPreviousMeterValue does not always contain a value
     def previousValue = cmd.scaledPreviousMeterValue ?: 0
 
-    def map = [ name: electricNames[cmd.scale], unit: electricUnits[cmd.scale], displayed: state.display]
+    def map = [ name: electricNames[cmd.scale], unit: electricUnits[cmd.scale], displayed: false]
     switch(cmd.scale) {
 	case 0: //kWh
 	    previousValue = device.currentValue("energy") ?: cmd.scaledPreviousMeterValue ?: 0
@@ -505,6 +498,8 @@ def zwaveEvent(physicalgraph.zwave.commands.meterv3.MeterReport cmd) {
     }
     //Check if the value has changed my more than 5%, if so mark as a stateChange
     map.isStateChange = ((cmd.scaledMeterValue - previousValue).abs() > (cmd.scaledMeterValue * 0.05))
+
     createEvent(map)
 }
 //EOF
+
