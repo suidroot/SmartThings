@@ -164,8 +164,8 @@ metadata {
  *	updated - Called when the preferences of the device type are changed
  */
 def updated() {
-	state.onOffDisabled = ("true" == disableOnOff)
-	state.debug = ("true" == debugOutput)
+    state.onOffDisabled = ("true" == disableOnOff)
+    state.debug = ("true" == debugOutput)
     if (state.debug) log.debug "updated(disableOnOff: ${state.onOffDisabled}, reportInterval: ${reportInterval}, switchAll: ${switchAll}, debugOutput: ${state.debug})"
     response(configure())
 }
