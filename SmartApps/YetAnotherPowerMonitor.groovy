@@ -1,5 +1,5 @@
 /**
- *  Yet Another Power Monitor
+ *  Yet Another Power Monitor /w Power off
  *
  *  Copyright 2015 Elastic Development
  *
@@ -29,7 +29,7 @@
 import groovy.time.*
 
 definition(
-    name: "Yet Another Power Monitor",
+    name: "Yet Another Power Monitor with Power Off",
     namespace: "elasticdev",
     author: "James P",
     description: "Using power monitoring switch, monitor for a change in power consumption, and alert when the power draw stops.",
@@ -70,6 +70,9 @@ preferences {
         input "enablePolling", "boolean", title: "Enable polling?", defaultValue: true
         input "interval", "number", title: "Polling interval in minutes:", description: "5", defaultValue: 5, required: false
         input "debugOutput", "boolean", title: "Enable debug logging?", defaultValue: false
+    }
+    section("Turn off this switch(s)..."){
+		input "switches", "capability.switch", multiple: true
     }
 }
 
@@ -163,6 +166,7 @@ def powerHandler(evt) {
         state.cycleOn = false
         state.cycleEnd = now()
         def duration = state.cycleEnd - state.cycleStart
+        log.trace ("State: ${state.cycleOn}", switchOff())
         log.trace "Cycle ended after ${duration} minutes."
     }
 }
@@ -190,5 +194,9 @@ private send(msg) {
  */
 private hideOptionsSection() {
     (interval || debugOutput) ? false : true
+}
+
+def switchOff (){
+	switches.off()
 }
 //EOF
